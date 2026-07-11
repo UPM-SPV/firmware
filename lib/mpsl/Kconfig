@@ -1,0 +1,16 @@
+menu "Init"
+
+	config SPV_INIT_MAX_TRACKED_DEPENDENCIES
+		int "Maximum tracked dependencies"
+		default 20
+		help
+			Specifies the maximum amount of unique dependencies the init
+			system can track.
+
+	config SPV_INIT_PRINT_DETAILED_ERROR
+		bool "Print detailed errors"
+		default y
+		help
+			Show detailed error messages when:
+				- Unmeetable dependencies encountered.
+endmenu
