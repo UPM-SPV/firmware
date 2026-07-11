@@ -1,0 +1,20 @@
+menu "Attestation"
+
+	config SPV_ATTESTATION_KEYID
+		hex "Identity key ID [0x00 to 0xFF]"
+		default 0x01
+		help
+			Selects the internal KMU slot ID in which the identity key will
+			be stored.
+
+	config SPV_ATTESTATION_CHALLENGE_LENGTH
+		int "Challenge length"
+		default 32
+		help
+			Specifies the Attestation protocol's challenge length.
+
+	config SPV_ATTESTATION_SIGNATURE_SIZE
+		int
+		default 64
+
+endmenu
