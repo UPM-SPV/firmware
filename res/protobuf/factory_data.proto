@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+/*
+ * Data stored in flash during manufacturing.
+ */
+message FactoryData {
+	// Always 0xFAC1DA1A
+	fixed32 magic = 1;
+
+	uint32 schema_version = 2;
+	// UNIX time.
+	uint64 manufacturing_date = 3;
+
+	// nul-terminated string.
+	string board_revision = 4;
+	// nul-terminated string.
+	string serial_number = 5;
+
+	// Stores the device's PUBLIC certificate.
+	// Private key is stored in the KMU.
+	bytes device_cert = 6;
+
+	// Stores the device's private key. Automatically deleted by the device
+	// after being imported.
+	bytes private_key = 7;
+}

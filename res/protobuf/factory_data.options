@@ -1,0 +1,4 @@
+FactoryData.board_revision   max_size:8 type:FT_STATIC
+FactoryData.serial_number    max_size:32 type:FT_STATIC
+FactoryData.device_cert      max_size:512 type:FT_STATIC
+FactoryData.private_key      max_size:32 type:FT_STATIC
