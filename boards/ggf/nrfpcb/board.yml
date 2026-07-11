@@ -1,0 +1,35 @@
+board:
+  name: nrfpcb
+  full_name: nrfpcb
+  vendor: ggf
+  socs:
+  - name: nrf54l15
+
+runners:
+  run_once:
+    '--recover':
+      - runners:
+          - nrfjprog
+          - nrfutil
+        run: first
+        groups:
+          - boards:
+              - nrfpcb/nrf54l15/cpuapp
+    '--erase':
+      - runners:
+          - nrfjprog
+          - jlink
+          - nrfutil
+        run: first
+        groups:
+          - boards:
+              - nrfpcb/nrf54l15/cpuapp
+    '--reset':
+      - runners:
+          - nrfjprog
+          - jlink
+          - nrfutil
+        run: last
+        groups:
+          - boards:
+              - nrfpcb/nrf54l15/cpuapp

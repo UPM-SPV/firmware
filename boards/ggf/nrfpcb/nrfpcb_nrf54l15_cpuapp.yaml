@@ -1,0 +1,10 @@
+identifier: nrfpcb/nrf54l15/cpuapp
+name: UPM NRF PCB
+vendor: ggf
+arch: arm
+toolchain:
+  - zephyr
+sysbuild: true
+ram: 188
+flash: 664
+supported: []

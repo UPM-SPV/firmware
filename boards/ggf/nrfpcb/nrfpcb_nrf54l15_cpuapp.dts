@@ -1,0 +1,274 @@
+/dts-v1/;
+
+#include <nordic/nrf54l15_cpuapp.dtsi>
+#include "nrfpcb-pinctrl.dtsi"
+
+/ {
+	model = "UPM NRF PCB";
+	compatible = "ggf,nrfpcb-cpuapp";
+
+	chosen {
+		zephyr,code-partition = &slot0_partition;
+		zephyr,settings-partition = &storage_partition;
+		zephyr,sram = &cpuapp_sram;
+		zephyr,flash = &cpuapp_rram;
+		zephyr,flash-controller = &rram_controller;
+	};
+
+	/*
+	 * LED, push-button and GPIO definitions.
+	 */
+
+	leds {
+		compatible = "gpio-leds";
+		usr_led: usr_led {
+			gpios = <&gpio2 6 GPIO_ACTIVE_HIGH>;
+			label = "User LED";
+		};
+	};
+
+	buttons {
+		compatible = "gpio-keys";
+		usr_button: usr_button {
+			gpios = <&gpio2 5 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "User push-button";
+		};
+	};
+
+	gpio_control {
+		compatible = "gpio-leds";
+		mic_sel: mic_sel {
+			gpios = <&gpio2 4 (GPIO_ACTIVE_LOW)>;
+			label = "Microphone select";
+		};
+	};
+
+	sgp40_power_domain: sgp40_power_domain {
+		status = "okay";
+		compatible = "power-domain-gpio";
+		enable-gpios = <&gpio2 7 (GPIO_ACTIVE_LOW)>;
+		#power-domain-cells = <0>;
+		startup-delay-us = <2000>;
+		off-on-delay-us = <10000>;
+	};
+
+	zephyr,user {
+		io-channels = <&adc 4>;
+	};
+
+	aliases {
+		usr-led = &usr_led;
+		usr-button = &usr_button;
+
+		light-sensor = &veml6035;
+		ambient-sensor = &shtc3;
+		voc-sensor = &sgp40;
+		microphone = &im70d122;
+
+		mic-sel = &mic_sel;
+		voc-power-domain = &sgp40_power_domain;
+	};
+};
+
+&clock {
+	status = "okay";
+};
+
+&grtc {
+	owned-channels = <0 1 2 3 4 5 6 7 8 9 10 11>;
+	/* Channels 7-11 reserved for Zero Latency IRQs, 3-4 for FLPR */
+	child-owned-channels = <3 4 7 8 9 10 11>;
+	status = "okay";
+};
+
+&cpuapp_sram {
+	status = "okay";
+};
+
+
+/*
+ * Partition table
+ *
+ * Split into 5 main categories:
+ * - MCUBoot (bootloader).
+ * - A/B partitions. Equally sized to support DFU updates.
+ * - Factory-provisioned permanent data.
+ * - NVS partition for storing settings and persistent data.
+ * - Sensor data for storing sensor readings.
+ */
+&cpuapp_rram {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x0 DT_SIZE_K(60)>;
+		};
+
+		slot0_partition: partition@f000 {
+			label = "image-0";
+			reg = <0xF000 DT_SIZE_K(332)>;
+		};
+
+		slot1_partition: partition@62000 {
+			label = "image-1";
+			reg = <0x62000 DT_SIZE_K(332)>;
+		};
+
+		factory_data: partition@b5000 {
+			label = "factory";
+			reg = <0xb5000 DT_SIZE_K(4)>;
+		};
+
+		storage_partition: partition@b6000{
+			label = "storage";
+			reg = <0xb6000 DT_SIZE_K(16)>;
+		};
+
+		// Fill all the way to the end (0x165000)
+		sensor_data_partition: partition@ba000 {
+			label = "sensor_data";
+			reg = <0xba000 DT_SIZE_K(684)>;
+		};
+	};
+};
+
+
+/*
+ * Internal configuration
+ */
+
+// 32MHz crystal.
+&hfxo {
+	status = "okay";
+	clock-frequency = <32000000>;
+
+	load-capacitors = "internal";
+	load-capacitance-femtofarad = <8000>;
+};
+// No 32kHz crystal.
+&lfxo {
+    status = "disabled";
+};
+
+&regulators {
+	status = "okay";
+};
+
+&vregmain {
+	status = "okay";
+	regulator-initial-mode = <NRF5X_REG_MODE_DCDC>;
+};
+
+/*
+ * GPIO configuration
+ */
+
+// Power domain 2 corresponds to GPIO port 1.
+&gpiote20 {
+	status = "okay";
+};
+
+// Only ports 1 and 2 are used.
+&gpio1 {
+	status = "okay";
+};
+&gpio2 {
+	status = "okay";
+};
+
+// By default, P1.02 and P1.03 are reserved for NFC.
+// Release them to be used by other peripherals (I²C).
+&uicr {
+	nfct-pins-as-gpios;
+};
+
+/*
+ * I²C configuration
+ */
+
+// Always-on I²C
+&i2c20 {
+	compatible = "nordic,nrf-twim";
+	status = "okay";
+
+	clock-frequency = <I2C_BITRATE_FAST>;
+	pinctrl-0 = <&i2c20_default>;
+	pinctrl-1 = <&i2c20_sleep>;
+	pinctrl-names = "default", "sleep";
+
+	zephyr,pm-device-runtime-auto;
+
+	shtc3: shtc3@70 {
+		compatible = "sensirion,shtc3", "sensirion,shtcx";
+		status = "okay";
+		reg = <0x70>;
+		measure-mode = "low-power";
+	};
+
+	veml6035: veml6035@29 {
+		compatible = "vishay,veml7700";
+		status = "okay";
+		reg = <0x29>;
+
+		zephyr,pm-device-runtime-auto;
+	};
+};
+
+// Gated I²C
+&i2c21 {
+	compatible = "nordic,nrf-twim";
+	status = "okay";
+	// Enable power-management.
+	// Allows enabling and disabling the peripheral. Starts OFF.
+	zephyr,pm-device-runtime-auto;
+
+	clock-frequency = <I2C_BITRATE_FAST>;
+	pinctrl-0 = <&i2c21_default>;
+	pinctrl-1 = <&i2c21_sleep>;
+	pinctrl-names = "default", "sleep";
+
+	sgp40: sgp40@59 {
+		compatible = "sensirion,sgp40";
+		status = "okay";
+		reg = <0x59>;
+
+		power-domains = <&sgp40_power_domain>;
+	};
+};
+
+
+/*
+ * Microphone configuration
+ */
+im70d122: &pdm20 {
+	status = "okay";
+
+	clock-source = "PCLK32M";
+	queue-size = <128>;
+	pinctrl-0 = <&pdm20_default>;
+	pinctrl-names = "default";
+};
+
+
+/*
+ * ADC configuration
+ */
+&adc {
+	#address-cells = <1>;
+    	#size-cells = <0>;
+	compatible = "nordic,nrf-saadc";
+	status = "okay";
+
+	// VBAT
+	channel@4 {
+		reg = <4>;
+		zephyr,reference = "ADC_REF_INTERNAL"; // Internal reference of 0.9V
+		zephyr,gain = "ADC_GAIN_1_4"; // Allows reading up to 3.6V (VDD max is 3.3V)
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <NRF_SAADC_AIN4>;
+		zephyr,resolution = <12>;
+	};
+};
