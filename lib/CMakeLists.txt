@@ -1,0 +1,7 @@
+add_subdirectory(attest)
+add_subdirectory(battery)
+add_subdirectory(factory_data)
+add_subdirectory(init)
+add_subdirectory(mpsl)
+add_subdirectory(rram)
+add_subdirectory(timesync)
