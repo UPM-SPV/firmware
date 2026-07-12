@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+/*
+ * Data for pairing tag.
+ */
+message NfcTag {
+	// Always 0x1A60DA1A
+	fixed32 magic = 1;
+
+	uint32 schema_version = 2;
+	string serial_number = 3;
+	// MAC in little-endian order.
+	bytes mac_address = 4;
+}
