@@ -14,6 +14,11 @@ target_sources(
 
 		src/fs/fs.c
 		src/fs/internal.c
+
+		src/sense/im70d122.c
+		src/sense/sgp40.c
+		src/sense/shtc3.c
+		src/sense/veml6035.c
 )
 
 target_include_directories(
