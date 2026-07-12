@@ -31,6 +31,8 @@ target_sources(
 		src/sense/veml6035.c
 
 		src/settings/settings.c
+
+		src/tasks/sensors.c
 )
 
 target_include_directories(
