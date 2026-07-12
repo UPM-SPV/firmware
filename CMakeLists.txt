@@ -12,6 +12,9 @@ target_sources(
 	PRIVATE
 		src/main.c
 
+		src/ble/ble.c
+		src/ble/advertise.c
+
 		src/fs/fs.c
 		src/fs/internal.c
 
