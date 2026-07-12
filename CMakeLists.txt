@@ -11,6 +11,9 @@ target_sources(
 
 	PRIVATE
 		src/main.c
+
+		src/fs/fs.c
+		src/fs/internal.c
 )
 
 target_include_directories(
