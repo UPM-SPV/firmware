@@ -26,6 +26,18 @@ target_sources(
 		src/fs/fs.c
 		src/fs/internal.c
 
+		src/init/attest.c
+		src/init/battery.c
+		src/init/ble.c
+		src/init/factorydata.c
+		src/init/fs.c
+		src/init/mpsl.c
+		src/init/sensors.c
+		src/init/settings.c
+		src/init/task_button_led.c
+		src/init/task_sensors.c
+		src/init/timesync.c
+
 		src/sense/im70d122.c
 		src/sense/sgp40.c
 		src/sense/shtc3.c
