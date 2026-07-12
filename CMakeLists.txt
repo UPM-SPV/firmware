@@ -19,6 +19,8 @@ target_sources(
 		src/sense/sgp40.c
 		src/sense/shtc3.c
 		src/sense/veml6035.c
+
+		src/settings/settings.c
 )
 
 target_include_directories(
@@ -28,7 +30,11 @@ target_include_directories(
 		src/
 )
 
+zephyr_nanopb_sources(app res/protobuf/device_settings.proto)
+
+zephyr_linker_sources(SECTIONS src/iterables.ld)
 target_link_libraries(app PUBLIC zephyr_interface)
+add_dependencies(app nanopb_generated_headers)
 
 target_link_libraries(app PRIVATE lib_attest)
 target_link_libraries(app PRIVATE lib_battery)

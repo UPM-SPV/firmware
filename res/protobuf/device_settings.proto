@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+/*
+ * Configurable device settings.
+ */
+message DeviceSettings {
+	uint32 schema_version = 1;
+
+	// Bitflags specifying which sensors are enabled.
+	uint32 sensor_flags = 2;
+	// Device will accept any value.
+	uint32 sampling_rate_seconds = 3;
+}
