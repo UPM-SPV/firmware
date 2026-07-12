@@ -14,6 +14,7 @@ target_sources(
 
 		src/ble/ble.c
 		src/ble/advertise.c
+		src/ble/attestation.c
 		src/ble/battery.c
 		src/ble/dis.c
 		src/ble/settings.c
