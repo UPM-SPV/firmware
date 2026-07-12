@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+/*
+ * SDS Data control type. Used to obtain historical sensor readings.
+ *
+ * The connected device should first obtain the associated L2CAP channel by
+ * sending a read request to the control characteristic. This will return an
+ * `SdsServiceMetadata` with the required information.
+ *
+ * The requester can then proceed to read the available data summaries by
+ * sending an `SdsSummaryRequest` message to the control characteristic. This
+ * will initiate an L2CAP transfer of all available summaries. The transmission
+ * is prefixed by an `SdsSummaryResponseHeader`.
+ *
+ * The device can finally request individual data sectors by sending
+ * `SdsDataRequest` and following the same procedure as with summary requests.
+ * The same header rules apply, but with an `SdsDataResponseHeader`.
+ */
+message SdsRequest {
+	uint32 schema_version = 1;
+
+	oneof message {
+		SdsSummaryRequest summary_request = 2;
+		SdsDataRequest data_request = 3;
+	}
+}
+
+/*
+ * Metadata about the SDS service.
+ */
+message SdsServiceMetadata {
+	uint32 schema_version = 1;
+
+	// Current L2CAP channel PSM associated with this connection.
+	uint32 l2cap_psm = 2;
+}
+
+
+/*
+ * Used to request summary information through the L2CAP channel.
+ */
+message SdsSummaryRequest {}
+
+/*
+ * Comes before the summary stream.
+ */
+message SdsSummaryResponseHeader {
+	// Always [0xB8, 0x4F, 0xB7, 0x3D]
+	fixed32 magic = 1;
+	// How many summaries are to be expected.
+	fixed32 summary_count = 2;
+}
+
+/*
+ * Requests a particular data sector to be sent through L2CAP.
+ */
+message SdsDataRequest {
+	// Which period to use, directly corresponds to the selected
+	// SensorSummary.PeriodSummary's index. 0-based.
+	uint32 period_index = 1;
+	// Full UNIX date of the requested PeriodSummary. Used for validation.
+	// If the request fails due to a wrong date, the device should update their
+	// Data summary.
+	uint64 period_unix_date = 2;
+
+	// Which reading to start from.
+	uint32 reading_offset_start = 3;
+}
+
+/*
+ * Comes before the sensor data stream.
+ */
+message SdsDataResponseHeader {
+	// Always [0xD7, 0xED, 0xAE, 0xAD]
+	fixed32 magic = 1;
+	// How many data blocks follow.
+	fixed32 data_block_count = 2;
+}

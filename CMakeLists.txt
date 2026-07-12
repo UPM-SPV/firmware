@@ -19,6 +19,7 @@ target_sources(
 		src/ble/dis.c
 		src/ble/l2cap.c
 		src/ble/settings.c
+		src/ble/sensor.c
 		src/ble/time.c
 
 		src/fs/fs.c
@@ -40,6 +41,7 @@ target_include_directories(
 )
 
 zephyr_nanopb_sources(app res/protobuf/device_settings.proto)
+zephyr_nanopb_sources(app res/protobuf/sensor_data_request.proto)
 
 zephyr_linker_sources(SECTIONS src/iterables.ld)
 target_link_libraries(app PUBLIC zephyr_interface)
