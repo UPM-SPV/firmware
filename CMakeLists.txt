@@ -33,6 +33,7 @@ target_sources(
 
 		src/settings/settings.c
 
+		src/tasks/button_led.c
 		src/tasks/sensors.c
 )
 
