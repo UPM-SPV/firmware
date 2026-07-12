@@ -1,0 +1,201 @@
+source "Kconfig.zephyr"
+
+menu "SPV"
+
+	rsource "lib/attest/Kconfig"
+	rsource "lib/init/Kconfig"
+
+	menu "Battery"
+		config SPV_BATTERY_MV_FULL
+			int "Battery full level (mV)"
+			default 3000
+			help
+				Expected voltage when battery is at 100%.
+
+		config SPV_BATTERY_MV_DEPLETED
+			int "Battery depleted level (mV)"
+			default 2000
+			help
+				Expected voltage when battery is at 0%.
+
+	endmenu
+
+	menu "BLE"
+		menu "L2CAP"
+			config SPV_BLE_L2CAP_CHANNELS_PER_CONNECTION
+				int "L2CAP channels per connection"
+				default 1
+				help
+					How many channels to preallocate per connection.
+
+			config SPV_BLE_L2CAP_BUFFER_SIZE
+				int "Buffer size (Bytes)"
+				default 128
+				help
+					Size of a single L2CAP buffer.
+
+			config SPV_BLE_L2CAP_BUFFERS_PER_CONNECTION
+				int "Buffers per connection"
+				default 48
+				help
+					How many L2CAP buffers to reserve for each connection.
+
+			config SPV_BLE_L2CAP_MSG_QUEUE_SIZE
+				int "Concurrent messages per channel"
+				default 8
+				help
+					Controls how many packets can be enqueued per connection.
+					Doesn't control the amount of buffers, but rather
+					how many calls to `ble_l2cap_send_enqueue` can be made
+					before any of them complete.
+		endmenu
+	endmenu
+
+	menu "Filesystem"
+		config SPV_FS_DATA_SECTOR_COUNT
+			int "Data readings per sector"
+			default 256
+			help
+				Specifies the amount of data blocks to store in each
+				data sector.
+
+	endmenu
+
+	menu "Sensors"
+		menu "Microphone"
+			config SPV_SENSE_MIC_SAMPLE_RATE
+				int "Sampling rate (Hz)"
+				default 16000
+				help
+					Microphone sampling rate.
+
+			config SPV_SENSE_MIC_BLOCK_MS
+				int "Block length (milliseconds)"
+				default 50
+				help
+					Length of each microphone capture.
+
+			config SPV_SENSE_MIC_BLOCKS_PER_CAPTURE
+				int "Blocks per capture"
+				default 4
+				help
+					How many blocks to read each capture.
+
+			config SPV_SENSE_MIC_WARMUP_CAPTURES
+				int "Warmup captures"
+				default 4
+				help
+					How many captures should be performed and discarded before
+					performing the real measurements.
+
+			config SPV_SENSE_MIC_SENSITIVITY
+				int "Microphone sensitivity (dBFS)"
+				default -26
+				help
+					Microphone sensitivity. See datasheet.
+
+			config SPV_SENSE_MIC_SENSITIVITY_REF
+				int "Microphone sensitivity reference (dBSPL)"
+				default 94
+				help
+					Reference point for microphone's sensitivity value.
+					See datasheet.
+
+		endmenu
+	endmenu
+
+
+	menu "Settings"
+		config SPV_SETTINGS_MAX_SAMPLING_PERIOD
+			int "Maximum sampling period (seconds)"
+			default 3600
+			help
+				Maximum sampling period configurable by the user.
+
+		config SPV_SETTINGS_MIN_SAMPLING_PERIOD
+			int "Minimum sampling period (seconds)"
+			default 60
+			help
+				Minimum sampling period configurable by the user.
+
+	endmenu
+
+	menu "UX"
+		menu "Pairing"
+			config SPV_UX_BTN_PAIRING_THRESHOLD_START_MS
+				int "Pairing start (milliseconds)"
+				default 2000
+				help
+					How long the button should be pressed before entering pairing
+					mode.
+
+			config SPV_UX_BTN_PAIRING_THRESHOLD_CANCEL_MS
+				int "Pairing cancel (milliseconds)"
+				default 5000
+				help
+					Cancels pairing mode if the button was not released before this
+					time.
+
+			config SPV_UX_PAIRING_DURATION_MS
+				int "Pairing mode duration (milliseconds)"
+				default 30000
+				help
+					How long to stay in pairing mode.
+
+			config SPV_UX_LED_PAIRING_BLINK_MS
+				int "Pairing blink period (milliseconds)"
+				default 400
+				help
+					LED blink frequency during pairing mode.
+
+		endmenu
+
+		menu "Reset"
+			config SPV_UX_BTN_RESET_THRESHOLD_START_MS
+				int "Reset start (milliseconds)"
+				default 10000
+				help
+					How long the button should be pressed before starting
+					reset indications.
+
+			config SPV_UX_BTN_RESET_THRESHOLD_END_MS
+				int "Reset end (milliseconds)"
+				default 20000
+				help
+					Total time before the reset is committed.
+
+			config SPV_UX_RESET_POST_WAIT_MS
+				int "Post-reset wait (milliseconds)"
+				default 5000
+				help
+					How long to wait after a reset before rebooting.
+
+			config SPV_UX_LED_RESET_BLINK_INITIAL_MS
+				int "Initial LED blinking period (milliseconds)"
+				default 1000
+				help
+					Initial blinking period during reset mode.
+
+			config SPV_UX_LED_RESET_BLINK_DECREMENT_DIV
+				int "LED blinking speed decrement divider"
+				default 10
+				help
+					Blinking speed acceleration multiplier. Higher means
+					slower acceleration.
+		endmenu
+
+		config SPV_UX_BTN_PRESSED_SLEEP_MS
+			int "Pressed button polling period (milliseconds)"
+			default 10
+			help
+				How often to poll the button pin when pressed.
+
+	endmenu
+
+	config SPV_UPDATE_CONFIRM_WINDOW_MS
+		int "Update confirmation delay (milliseconds)"
+		default 30000
+		help
+			How long to wait after system initialization to confirm an update.
+
+endmenu
