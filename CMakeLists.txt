@@ -17,6 +17,7 @@ target_sources(
 		src/ble/attestation.c
 		src/ble/battery.c
 		src/ble/dis.c
+		src/ble/l2cap.c
 		src/ble/settings.c
 		src/ble/time.c
 
