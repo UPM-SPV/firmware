@@ -1,0 +1,27 @@
+{
+	"packages": {
+		".": {
+			"release-type": "simple",
+			"separate-pull-requests": false,
+			"bump-minor-pre-major": true,
+			"bump-patch-for-minor-pre-major": true,
+			"pull-request-title-pattern": "chore: release ${version}",
+			"pull-request-header": "Hey, I've just pulled together a new release.",
+			"pull-request-footer": "This PR was generated automatically.",
+			"include-commit-authors": true,
+			"changelog-sections": [
+				{"type": "feat", "section": "New features"},
+				{"type": "fix", "section": "Bug fixes"},
+				{"type": "perf", "section": "Performance improvements"},
+				{"type": "deps", "section": "Dependency updates"},
+				{"type": "docs", "section": "Documentation", "hidden": false},
+				{"type": "chore", "section": "Maintenance"},
+				{"type": "test", "section": "Tests"}
+			],
+			"extra-files": [
+				"VERSION"
+			]
+		}
+	},
+	"$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}

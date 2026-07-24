@@ -12,6 +12,7 @@ NCS_PATH=$(dirname "${ZEPHYR_BASE}")
 KEY_PATH="config/local"
 SIGNKEY_PATH="${KEY_PATH}/signing_key.pem"
 ENCKEY_PATH="${KEY_PATH}/encryption_key.pem"
+ENCKEY_PUB_PATH="${KEY_PATH}/encryption_key_pub.pem"
 
 if [ -e "${SIGNKEY_PATH}" ] && [ -e "${ENCKEY_PATH}" ]; then
 	BOLD="\033[1m"
@@ -48,6 +49,9 @@ if [ ! -e "${ENCKEY_PATH}" ]; then
 	echo "Generating new encryption key in '${ENCKEY_PATH}'."
 	# Using x25519 is required for the encryption key.
 	python3 "${NCS_PATH}/bootloader/mcuboot/scripts/imgtool.py" keygen -t x25519 -k "${ENCKEY_PATH}"
+
+	echo "Storing encryption key's public part in '${ENCKEY_PUB_PATH}'."
+	openssl ec -in "${ENCKEY_PATH}" -pubout -out "${ENCKEY_PUB_PATH}"
 fi
 
 echo "Done."

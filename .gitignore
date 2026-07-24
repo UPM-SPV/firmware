@@ -6,6 +6,8 @@
 !Kconfig
 !prj.conf
 !README.md
+!release-please-config.json
+!.release-please-manifest.json
 !sysbuild.conf
 !VERSION
 

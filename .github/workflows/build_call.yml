@@ -1,0 +1,96 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      use_prodkeys:
+        description: "Whether to sign this build with production keys"
+        type: boolean
+        required: true
+
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NCS_VERSION: v3.3.0
+
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+      ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download nrfutil
+        run: |
+          echo ${{ github.ref_name }}
+          wget https://developer.nordicsemi.com/.pc-tools/nrfutil/x64-linux/nrfutil -O /usr/local/bin/nrfutil
+          chmod +x /usr/local/bin/nrfutil
+          nrfutil install toolchain-manager
+
+
+      - name: Cache NCS SDK and Toolchain
+        id: cache-ncs
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.west
+            ~/ncs
+            ~/bootloader
+            ~/modules
+            ~/nrf
+            ~/nrfxlib
+            ~/tools
+            ~/zephyr
+          key: ${{ runner.os }}-ncs-${{ env.NCS_VERSION }}
+
+
+      - name: Install NCS ${{ env.NCS_VERSION }}
+        if: steps.cache-ncs.outputs.cache-hit != 'true'
+        run: |
+          cd ~/
+          nrfutil toolchain-manager install --ncs-version ${{ env.NCS_VERSION }}
+
+          # `nrfutil launch` creates an interactive shell with the required env set.
+          # For a non-interactive session, we create an env file, and source it.
+          nrfutil toolchain-manager env --as-script --ncs-version ${{ env.NCS_VERSION }} > env.sh
+          source env.sh
+
+          west init -m https://github.com/nrfconnect/sdk-nrf --mr ${{ env.NCS_VERSION }}
+          west update --narrow -o=--depth=1
+
+
+      - name: Build firmware
+        run: |
+          nrfutil toolchain-manager env --as-script --ncs-version ${{ env.NCS_VERSION }} > env.sh
+          source env.sh
+
+          cd ${{ github.workspace }}
+
+          if [[ "${{ inputs.use_prodkeys }}" == "true" ]]; then
+            sh config/keys/keyimportgh.sh
+            echo "Using prodkeys"
+          else
+            source ~/zephyr/zephyr-env.sh
+            sh config/keys/keygen.sh
+            echo "Using dummy keys"
+          fi
+
+          BOARD_ROOT="$(pwd)" west build --board nrfpcb/nrf54l15/cpuapp -t dfu_application.zip -- \
+            -DCONFIG_LOG_MAX_LEVEL=0 \
+            -DCONFIG_CONSOLE=n \
+            -DCONFIG_RTT_CONSOLE=n \
+            -DCONFIG_USE_SEGGER_RTT=n \
+            -DCONFIG_LOG_BACKEND_RTT=n \
+            -DCONFIG_SIZE_OPTIMIZATIONS_AGGRESSIVE=y \
+            -DCONFIG_ASSERT=n \
+            -DCONFIG_SPV_INIT_PRINT_DETAILED_ERROR=n
+
+
+      - name: Upload built firmware image
+        uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: ${{ github.workspace }}/build/dfu_application.zip
