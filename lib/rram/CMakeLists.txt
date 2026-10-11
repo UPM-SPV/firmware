@@ -10,5 +10,4 @@ target_include_directories(
 		"include/"
 )
 
-target_link_libraries(lib_rram PUBLIC zephyr_interface)
-add_dependencies(lib_rram offsets_h)
+target_link_libraries(lib_rram PRIVATE zephyr_interface)

@@ -9,5 +9,5 @@ target_include_directories(
 	PUBLIC
 		"include/"
 )
-target_link_libraries(lib_attest PUBLIC zephyr_interface)
-add_dependencies(lib_attest offsets_h)
+
+target_link_libraries(lib_attest PRIVATE zephyr_interface)

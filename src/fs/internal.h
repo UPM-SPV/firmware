@@ -16,14 +16,14 @@
 #define SPV_FS_SUPERBLOCK_MAGIC	0xE5DFFD5E	// ESDF FDSE
 #define SPV_FS_SUPERBLOCK_COUNT	3
 
-#define	FS_SIZE 	FIXED_PARTITION_SIZE(sensor_data_partition)
+#define	FS_SIZE 	PARTITION_SIZE(sensor_data_partition)
 #define FS_DATA_PER_SECTOR	SPV_FS_DATA_SECTOR_SIZE / sizeof(struct fs_data_entry_t)
 #define SECTOR_COUNT	(\
 	(FS_SIZE - sizeof(struct fs_superblock_t) * SPV_FS_SUPERBLOCK_COUNT)					\
 		/																		\
 	(sizeof(struct fs_summary_t) + SPV_FS_DATA_SECTOR_SIZE)							\
 )
-#define FS_START			FIXED_PARTITION_ADDRESS(sensor_data_partition)
+#define FS_START			PARTITION_ADDRESS(sensor_data_partition)
 #define FS_SUMMARY_START	(FS_START + sizeof(struct fs_superblock_t))
 #define FS_SUMMARY_END		(FS_SUMMARY_START + sizeof(struct fs_summary_t) * SECTOR_COUNT)
 #define FS_DATA_START		(FS_SUMMARY_END + sizeof(struct fs_superblock_t))

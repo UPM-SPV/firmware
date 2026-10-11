@@ -12,6 +12,4 @@ target_include_directories(
 
 zephyr_linker_sources(SECTIONS src/iterables.ld)
 
-
-target_link_libraries(lib_mpsl PUBLIC zephyr_interface)
-add_dependencies(lib_mpsl offsets_h)
+target_link_libraries(lib_mpsl PRIVATE zephyr_interface)

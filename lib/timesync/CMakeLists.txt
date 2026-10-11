@@ -11,7 +11,5 @@ target_include_directories(
 )
 zephyr_linker_sources(SECTIONS src/iterables.ld)
 
-target_link_libraries(lib_timesync PUBLIC zephyr_interface)
-add_dependencies(lib_timesync offsets_h)
-
+target_link_libraries(lib_timesync PRIVATE zephyr_interface)
 target_link_libraries(lib_timesync PRIVATE lib_factory_data)
