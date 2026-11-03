@@ -11,7 +11,7 @@ bool fs_int_superblock_validate(const struct fs_superblock_t *sblock) {
 	return
 		sblock->magic == SPV_FS_SUPERBLOCK_MAGIC &&
 		sblock->active_sector_index < SECTOR_COUNT &&
-		sblock->valid_sectors < SECTOR_COUNT;
+		sblock->valid_sectors <= SECTOR_COUNT;
 }
 
 struct fs_superblock_t* fs_int_superblock_get_idx(size_t index) {
