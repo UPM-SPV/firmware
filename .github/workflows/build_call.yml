@@ -26,7 +26,7 @@ jobs:
       - name: Download nrfutil
         run: |
           echo ${{ github.ref_name }}
-          wget https://developer.nordicsemi.com/.pc-tools/nrfutil/x64-linux/nrfutil -O /usr/local/bin/nrfutil
+          wget https://files.nordicsemi.com/artifactory/swtools/external/nrfutil/executables/x86_64-unknown-linux-gnu/nrfutil -O /usr/local/bin/nrfutil
           chmod +x /usr/local/bin/nrfutil
           nrfutil install toolchain-manager
 
